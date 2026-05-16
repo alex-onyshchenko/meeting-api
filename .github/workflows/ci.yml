@@ -22,9 +22,11 @@ jobs:
       - name: Install uv
         run: pip install uv
 
-      - name: Install dependencies
-        run: uv sync --frozen
+      - name: Create venv
+        run: uv venv
 
-      - name: Run basic import test
-        run: |
-          python -c "import main; print('API imports successfully')"
+      - name: Install dependencies
+        run: uv pip install fastapi uvicorn pydantic
+
+      - name: Run import test
+        run: uv run python -c "import main; print('API imports successfully')"
