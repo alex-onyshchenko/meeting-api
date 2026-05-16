@@ -1,0 +1,65 @@
+# --- VARIABLES ---
+@baseUrl = http://127.0.0.1:8000
+@roomId = 123e4567-e89b-12d3-a456-426614174000
+@organizerId = 987fcdeb-51a2-43d7-9012-3456789abcde
+
+### 1. Get All Rooms
+GET {{baseUrl}}/rooms
+
+
+### 2. Get All Meetings (Should be empty initially)
+GET {{baseUrl}}/meetings
+
+
+### 3. Create a New Meeting
+# @name createMeeting
+POST {{baseUrl}}/meetings
+Content-Type: application/json
+
+{
+    "title": "Initial Planning",
+    "description": "Discussing project architecture",
+    "startTime": "2026-03-10T10:00:00Z",
+    "endTime": "2026-03-10T11:00:00Z",
+    "organizerId": "{{organizerId}}",
+    "roomId": "{{roomId}}",
+    "status": "SCHEDULED"
+}
+
+
+### 4. Attempt to Create a Conflicting Meeting (Should return 409 Conflict)
+POST {{baseUrl}}/meetings
+Content-Type: application/json
+
+{
+    "title": "Overlapping Meeting",
+    "description": "This should fail because it overlaps the 10:00 - 11:00 meeting",
+    "startTime": "2026-03-10T10:30:00Z",
+    "endTime": "2026-03-10T11:30:00Z",
+    "organizerId": "{{organizerId}}",
+    "roomId": "{{roomId}}",
+    "status": "SCHEDULED"
+}
+
+
+### 5. Update the Meeting (Using ID from Step 3)
+PUT {{baseUrl}}/meetings/{{createMeeting.response.body.id}}
+Content-Type: application/json
+
+{
+    "title": "Initial Planning - Extended",
+    "description": "Discussing project architecture and database schema",
+    "startTime": "2026-03-10T10:00:00Z",
+    "endTime": "2026-03-10T11:30:00Z",
+    "organizerId": "{{organizerId}}",
+    "roomId": "{{roomId}}",
+    "status": "SCHEDULED"
+}
+
+
+### 6. Delete the Meeting (Using ID from Step 3)
+DELETE {{baseUrl}}/meetings/{{createMeeting.response.body.id}}
+
+
+### 7. Verify Deletion (Should be empty again)
+GET {{baseUrl}}/meetings
